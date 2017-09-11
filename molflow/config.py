@@ -1,12 +1,30 @@
-# JMS 9/6/17 Needs updating
-# """
-# This module determines and stores:
-#  - compute service configuration
-#  - workflow locations
-# """
+# Copyright 2017 Autodesk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
-#import collections
+"""
+ config.py
+
+ This module is used to handle the configuration of molflow. 
+  It tracks: 
+   - Information contained in the config file (~/.molflow/config) such as local repo paths
+   - Configuration status of all discovered workflows (local or remote locations)
+     - Workflow Definition
+     - Workflow Metadata
+     - Workflow Versions
+  It is used by most command line functions in order to retrieve specific workflows, get information about them, run them, etc.
+"""
 
 from pathlib import Path                # All path operations. Note that we have
                                         # to workaround some things that are in
@@ -18,18 +36,19 @@ import yaml                             # Used for reading metadata.
 
 from past.builtins import basestring    # Used for checking if something is str
                                         # or unicode. May no longer be needed if
-                                        # we update the formatter. JMS
+                                        # we update the formatter. 
 
-from termcolor import cprint, colored
+from termcolor import cprint, colored   # For colorizing warning/error
+                                        # messages. Should not be needed if we
+                                        # update the formatter to have a better
+                                        # range of error messaging.
+          
 
-import configparser
+import configparser                     # Config file reader
 
 
-from .versioning import WorkflowVersions
+from .versioning import WorkflowVersions  # Component of WorkflowConfig object.
 
-
-#ConfigObj = collections.namedtuple('MolFlowConfig', ['workflow_dirs', 'versions'])
-#BUILTIN_WORKFLOWS = pathlib.Path(__file__).parents[1] / 'workflows'
 
 # Configuration file used if none is found. 
 sample_config_file = u"\
@@ -60,7 +79,6 @@ class Config( object ):
     They include the following key components:
        1. Information contained within the configuration file.
        2. State information for all local and remote workflows.
-       3. 
     """
     def __init__(self, config_file_location = "~/.molflow/config"):
         """ Initializes a configuration object based on the path in which to find the configuration file. """
@@ -68,13 +86,15 @@ class Config( object ):
 
         try:
             config_file_path = config_file_path.expanduser()
-        except AttributeError:          # pathlib's 2.7 version doesn't have the .expanduser function.
+        except AttributeError:          # pathlib's 2.7 version doesn't have the
+                                        # .expanduser function.
             import os.path
             config_file_path = Path(os.path.expanduser(config_file_location))
         
         try:
             self._configdata = self.load_config( config_file_path )
-        except IOError:   # catching path not existing errors as well as others related to IO.
+        except IOError:   # catching path not existing errors as well as others
+                          # related to IO.
             self.create_config( config_file_path )
             self._configdata = self.load_config( config_file_path )
 
@@ -82,21 +102,21 @@ class Config( object ):
                 
         try:
             self._workflow_paths = [i.expanduser().absolute() for i in self._config_paths]
-        except AttributeError:         # pathlib's 2.7 version doesn't have the .expanduser function
+        except AttributeError:         # pathlib's 2.7 version doesn't have the
+                                       # .expanduser function
             import os.path
             self._workflow_paths = [Path(os.path.expanduser(str(i))).absolute() for i in self._config_paths]
 
         self.discover_local_workflows()
-
-        pass
     # end __init__(...)
+
 
     def load_config( self, config_file_path ):
         with config_file_path.open('rt') as f:
             config_parser = configparser.ConfigParser()
             config_parser.read_file( f )
         return config_parser
-        
+
 
     def create_config( self, config_file_path ):
         print("Configuration file at {} not found, creating default config.".format( config_file_path ))
@@ -111,6 +131,7 @@ class Config( object ):
         with config_file_path.open("wt") as f:
             f.write( sample_config_file )
 
+
     def discover_local_workflows( self, paths=None ):
         if paths is None:
             paths = [p for p in self._workflow_paths if p.exists()]
@@ -124,8 +145,6 @@ class Config( object ):
         for p in paths:
             possible_workflows = [item for item in p.iterdir() if item.is_dir()]
             for workflow in possible_workflows:
-                # TODO: JMS 9/10: Check if metadata is required or not. I would say it is.
-                #                 Will change some later assumptions if it is not required.
                 if (workflow / 'workflow.py').exists() and (workflow / 'metadata.yml').exists():
                     wf = WorkflowConfiguration( name = workflow.stem,
                                                 path = Path(workflow),
@@ -134,6 +153,7 @@ class Config( object ):
 
 
         self._index_local_workflows()
+    #end def discover_local_workflows( self, paths=None )
 
     def _index_local_workflows( self ):
         """ Builds some dictionaries so we can easily find workflows by name, path, config path. """
@@ -166,17 +186,13 @@ class Config( object ):
             if len( self._workflows_by_name[wf_name] ) > 1:
                 print("A workflow named '{}' was found via multiple local workflow paths.\nLocations found: {}".format(wf_name, [i.config_path for i in self._workflows_by_name[wf_name]]))
 
-
-
-
-        pass
+    # end def _index_local_workflows( self )
 
     def get_local_workflows_by_config_path(self, config_path):
         return self._workflows_by_config_path.get(str(config_path),[])
 
     def get_local_workflows(self):
         return self._local_workflows
-
 
     def get_workflow_by_name( self, name , raise_issues=False ):
         # Note: currently hooked up to local only, needs to check both local and remotes eventually.
@@ -186,9 +202,6 @@ class Config( object ):
             cprint("{warning} {name} is not a valid workflow name.".format( 
                 warning=colored("ERROR:",'red',attrs=['bold']),
                 name=colored(name, 'green')))
-            # TODO: JMS 9/10. Consider rebuilding the formatting module to be
-            #                 useful and have a distinctive error formatter and
-            #                 use that instead.
             import sys
             sys.exit(1)
         if raise_issues and len(workflows)>1:
@@ -224,6 +237,8 @@ class Config( object ):
     def config_paths( self ):
         return self._config_paths
 
+
+
 class WorkflowConfiguration( object ):
     def __init__( self, name, path, config_path ):
         self.name = name
@@ -242,7 +257,6 @@ class WorkflowConfiguration( object ):
     @property
     def workflow( self ):
         if self._workflow is None:
-            # TODO: JMS Note: this section basically replaces loader.py
             namespace = {}
             workflow_path = self.path / 'workflow.py'
             with workflow_path.open("r") as wflowfile:
@@ -270,49 +284,8 @@ WorkflowConfiguration: Name: {self.name}\n\
                        Path: {self.path}\n\
                        ConfigPath: {self.config_path}".format( self=self )
 
-    pass
 
-
-
-
-
-
-configuration = Config()
-
-
-
-# _config_save = None
-
-# def get():
-#     """ Return the current configuration
-#
-#     Returns:
-#         List[pathlib.Path]: list of *absolute paths* to directories to search for workflows
-#     """
-#     # TODO: user-specified workflow directories
-#     global _config_save
-#
-#     if _config_save is None:
-#         workflow_dirs = [BUILTIN_WORKFLOWS.absolute()]
-#         versions = Versions()
-#         for dir in workflow_dirs:
-#             versions.read_version_hashes(dir)
-#         _config_save = ConfigObj(workflow_dirs=workflow_dirs,
-#                                  versions=versions)
-#     return _config_save
-
-
-# def get_metadata_by_name(name, inspect_workflow=False):
-#     wdir = get_workflow_dir(name)
-#     metafile = wdir / 'metadata.yml'
-#     if metafile.is_file():
-#         data = WorkflowMetadata(metafile)
-#         if inspect_workflow:
-#             data.inspect_workflow()
-#         return data
-#     else:
-#         print("Warning: directory '%s' exists but has no metadata.yml")
-
+#end class WorkflowConfig(object)
 
 
 class WorkflowMetadata(object):
@@ -328,23 +301,8 @@ class WorkflowMetadata(object):
             self.metadata = {}
         if self.metadata == None:
             self.metadata = {}
-        #self.workflowdir = path.absolute().parents[0]
-        #self.sourcedir = self.workflowdir.parents[0]
-        # self._version = None
         self.inputs = []
         self.outputs = []
-
-    # @property
-    # def version(self):
-    #     if self._version is None:
-    #         self._version = get().versions.get_version_string(self.sourcedir, self.workflowdir.name)
-    #     return self._version
-
-    # @property
-    # def last_version(self):
-    #     versions = get().versions
-    #     lastversion = versions.get_last_version(self.sourcedir, self.workflowdir.name)
-    #     return lastversion
 
     def add_workflow_information(self, workflow):
         self.inputs = []
@@ -368,26 +326,18 @@ class WorkflowMetadata(object):
             inputstr += ' (default: %s)' % val.default
         l.append({key: inputstr.strip()})
 
-    # def update_version(self, newversion):
-    #     versions = get().versions
-    #     versions.update_version(self.sourcedir, self.workflowdir.name, newversion)
-
-    # def is_updated(self):
-    #     versions = get().versions
-    #     lastversion = self.last_version
-    #     if lastversion == 'unversioned':
-    #         return True
-    #     elif lastversion.sha1 != versions.get_directory_sha1(self.workflowdir):
-    #         return True
-    #     else:
-    #         return False
-
-    # def is_dirty(self):
-    #     return get().versions.get_directory_dirty(self.workflowdir)
-
     def matches(self, keywords):
         for k in keywords:
             if k not in self.metadata.get('keywords', []):
                 return False
         else:
             return True
+
+#end class WorkflowMetadata(object)
+
+
+# Important - this object is what typically gets used by all of the command
+# options. We rarely need to create more than one Config, but it's occasionally
+# useful if using this module interactively.
+
+configuration = Config()

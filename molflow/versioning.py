@@ -1,17 +1,25 @@
-from __future__ import print_function
+# Copyright 2017 Autodesk Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
+
+from __future__ import print_function
 
 from git import Repo, InvalidGitRepositoryError
 
-
 import semver
 
-# import collections
-# import yaml
-# import subprocess
-
 from . import formatting
-
 
 
 class WorkflowVersions(object):
@@ -187,108 +195,3 @@ class WorkflowVersions(object):
     def _check_current_state( self ):
         self.git_dirty = self.git_repo.is_dirty()
 
-            
-# class Versions(object):
-#     def __init__(self):
-#         self.sources = {}
-
-#     def read_version_hashes(self, parentdir):
-#         if parentdir in self.sources:
-#             raise ValueError('Already read version hashes for file "%s"' % parentdir)
-#         self.sources[parentdir.absolute()] = self.get_version_hashes(parentdir)
-
-#     def get_last_version(self, source, workflowname):
-#         if source not in self.sources:
-#             raise ValueError('No version information for workflows in source')
-
-#         versions = self.sources[source]
-#         if workflowname not in versions:
-#             return 'unversioned'
-
-#         return versions[workflowname]
-
-#     def get_version_string(self, source, workflowname):
-#         version_id = self.get_last_version(source, workflowname)
-#         if version_id == 'unversioned':
-#             return version_id
-
-#         dir = source / workflowname
-#         sha1 = self.get_directory_sha1(dir)
-#         if sha1 != version_id.sha1 or self.get_directory_dirty(dir):
-#             return 'mod'+version_id.version
-#         else:
-#             return version_id.version
-
-#     def update_version(self, source, workflowname, newversion):
-#         newsha = self.get_directory_sha1(source / workflowname)
-#         self.sources[source.absolute()][workflowname] = VersionId(version=newversion, sha1=newsha)
-#         data = {key: {'sha1': val.sha1, 'version': val.version}
-#                 for key, val in
-#                 sorted(self.sources[source.absolute()].items())}
-
-#         with (source/".versions.yml").open('w') as verfile:
-#             yaml.dump(data, verfile, default_flow_style=False)
-
-#     @staticmethod
-#     def get_version_hashes(parentdir):
-#         """ Parse the .versions.yml file, if it exists
-
-#         Args:
-#             parentdir (pathlib.Path): directory containing the workflows and the .versions.yml file
-
-#         Returns:
-#             Dict[str, VersionId]: stored version numbers and SHA-1 hashes.
-#                If .versions.yml does not exists, returns an empty dict
-#         """
-#         path = parentdir/".versions.yml"
-#         if not path.exists():
-#             print('Warning: No version information for workflows in directory %s' % parentdir)
-#             return {}
-#         with path.open('r') as verfile:
-#             versions = yaml.load(verfile)
-#         if versions is None:
-#             return {}  # the file is empty
-#         for key, value in versions.items():
-#             versions[key] = VersionId(**value)
-
-#         return versions
-
-#     @staticmethod
-#     def get_directory_sha1(dir):
-#         """ Return SHA-1 of a git directory
-
-#         Note:
-#             This returns the SHA-1 of the HEAD only. Use `get_directory_dirty` as well to check
-#             if there are local changes.
-
-#         Args:
-#             dir (pathlib.Path): path within this git repo
-
-#         Returns:
-#             str: the directory's sha-1
-#         """
-#         dir = dir.absolute()
-#         oput = subprocess.check_output(['git', 'ls-tree', '-d', 'HEAD', dir.name],
-#                                        cwd=dir.parents[0].as_posix())
-#         lines = oput.splitlines()
-#         if len(lines) != 1:
-#             raise IOError('Error examining directory %s' % dir)
-
-#         return lines[0].split()[2]
-
-#     @staticmethod
-#     def get_directory_dirty(dir):
-#         """ Return True if directory has changes (staged or not) relative to its HEAD
-
-#         Args:
-#             dir (pathlib.Path): path within this git repo
-
-#         Returns:
-#             bool: True if directory has changes or untracked files relative to HEAD
-
-#         References:
-#             http://stackoverflow.com/a/2658301/1958900
-#         """
-#         oput = subprocess.check_output('git status --porcelain .'.split(),
-#                                        cwd=dir.absolute().as_posix())
-#         return bool(oput.strip())
