@@ -1,34 +1,35 @@
-import yaml
-from pathlib import Path
-from .config import get_workflow_dir
+# import yaml
+# from pathlib import Path
+# from .config import configuration
 
 
-def load_workflow(wflow):
-    """ Assemble and retreive workflow object from the specified directory
+# def load_workflow(wflow):
+#     """ Assemble and retreive workflow object from the specified directory
 
-    TODO: load metadata as well
+#     TODO: load metadata as well
 
-    Args:
-        wflow (str or Path): name of workflow OR directory where the workflow resides
+#     Args:
+#         wflow (str or Path): name of workflow OR directory where the workflow resides
 
-    Returns:
-        molflow.definitions.WorkflowDefinition
-    """
-    dirpath = get_workflow_dir(wflow)
-    workflow_path = dirpath / 'workflow.py'
-    metadata_path = dirpath / 'metadata.yml'
+#     Returns:
+#         molflow.definitions.WorkflowDefinition
+#     """
+#     workflow_config = configuration.get_workflow_by_name(wflow)
 
-    # execute the definition file
-    namespace = {}
-    with workflow_path.open("r") as wflowfile:
-        code = compile(wflowfile.read(), "workflow.py", 'exec')
-        exec(code, namespace)
+#     workflow_path = workflow_config.path / 'workflow.py'
+#     metadata_path = workflow_config.path / 'metadata.yml'
 
-    # load metadata only if available
-    workflow = namespace['__workflow__']
-    if metadata_path.exists():
-        with metadata_path.open('r') as metafile:
-            workflow.metadata = yaml.load(metafile)
+#     # execute the definition file
+#     namespace = {}
+#     with workflow_path.open("r") as wflowfile:
+#         code = compile(wflowfile.read(), "workflow.py", 'exec')
+#         exec(code, namespace)
 
-    workflow.definition_path = dirpath
-    return workflow
+#     # load metadata only if available
+#     workflow = namespace['__workflow__']
+#     if metadata_path.exists():
+#         with metadata_path.open('r') as metafile:
+#             workflow.metadata = yaml.load(metafile)
+
+#     workflow.definition_path = dirpath
+#     return workflow

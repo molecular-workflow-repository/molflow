@@ -1,13 +1,17 @@
+# TODO: JMS 9/10: This isn't a runner, should be top level. Possible rename to cwl_command.py?
+
 from pathlib import Path
 import shutil
 import yaml
 
 from ..run import EXECUTOR
-from ..loader import load_workflow
+#from ..loader import load_workflow
+from ..config import configuration
 
 
 def export_cwl(args):
-    workflow = load_workflow(args.workflow_name)
+    workflow_config = configuration.get_workflow_by_name( args.workflow_name )
+    workflow = workflow_config.workflow
     if args.outputdir is None:
         dest = Path('%s.cwl' % workflow.name)
     else:

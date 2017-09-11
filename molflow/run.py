@@ -7,9 +7,9 @@ from pathlib import Path
 import pickle
 
 from . import convert, formatting
+from .config import configuration
 from .serializers import SERIALIZERS, EXTENSIONS
-from .loader import load_workflow
-from .convert import translate_cli_input, CONVERTER
+from .convert import translate_cli_input, get_converter
 
 EXECUTOR = str(Path(__file__).parents[0]/'static'/'runstep.py')
 
@@ -18,7 +18,12 @@ def run_workflow(args):
     from .runners.localrunner import LocalRunner
 
     # Set up inputs and output destination
-    workflow = load_workflow(args.workflow_name)
+    workflow_config = configuration.get_workflow_by_name(args.workflow_name)
+    workflow = workflow_config.workflow
+    if args.version is not None:
+        workflow_config.versions.select_version( args.version )
+    else:
+        workflow_config.versions.select_default_version()
     inputs = get_inputs(workflow, args)
     outputpath = setup_output_dir(args.outputdir, workflow, args.overwrite)
 
@@ -123,9 +128,9 @@ def write_outputs(outputpath, workflow, outputs):
                 files.append(fpath)
 
         elif dtype in convert.RECOGNIZED:
-            runner = run_local(CONVERTER, {'input_data': outfile,
-                                           'input_format': 'object',
-                                           'output_format': dtype})
+            runner = run_local(get_converter(), {'input_data': outfile,
+                                                 'input_format': 'object',
+                                                 'output_format': dtype})
             runner.run()
             data = runner.output_files['result']
             as_str = pickle.loads(data.read())

@@ -24,6 +24,14 @@ def _key_colorer(m):
 
 
 def pretty_path(p):
+    p_with_home = None
+    if "~" in str(p):
+        p_with_home = p
+        try:
+            p = p.expanduser()
+        except AttributeError:
+            import os.path
+            p = Path(os.path.expanduser( str(p) ))
     p = p.absolute()
     cwd = Path.cwd()
     if p == cwd:
@@ -31,6 +39,8 @@ def pretty_path(p):
     try:
         return './' + p.relative_to(cwd).as_posix()
     except ValueError:
+        if p_with_home is not None:
+            return p_with_home.as_posix()
         return p.as_posix()
 
 

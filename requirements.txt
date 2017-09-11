@@ -4,3 +4,6 @@ pyccc >= 0.7.0
 pyyaml
 semver
 termcolor >= 1.0
+configparser >= 3.5.0
+GitPython
+

@@ -1,3 +1,4 @@
 include versioneer.py
 include molflow/_version.py
-include molflow/workflows
+recursive-include molflow *.py
+recursive-include molflow *.yml

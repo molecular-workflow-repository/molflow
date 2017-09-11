@@ -3,9 +3,7 @@ from __future__ import absolute_import
 import yaml
 from pathlib import Path
 import pickle
-
-from .loader import load_workflow
-from .config import get_workflow_dir
+from .config import configuration
 from .utils import RMODE, WMODE
 from .serializers import BUILTIN_TYPES
 
@@ -17,7 +15,12 @@ MAXCONVERTCPU = 1
 # TODO: remove redundancy between this and the actual `convert` workflow
 RECOGNIZED = set('mdt pdb mmcif cif sdf mol2 xyz smi smiles inchi name pdbcode mol'.split())
 
-CONVERTER = load_workflow(get_workflow_dir('convert'))
+__CONVERTER = None
+def get_converter():
+    if __CONVERTER is None:
+        convert_config = configuration.get_workflow_by_name('convert', raise_issues=True)
+        __CONVERTER = convert_config.workflow
+    return __CONVERTER 
 
 
 def drive_converter(args):
@@ -42,7 +45,7 @@ def drive_converter(args):
               'input_format': pickle.dumps(infmt, PICKLE_PROTOCOL),
               'output_format': pickle.dumps(outfmt, PICKLE_PROTOCOL)}
 
-    runner = LocalRunner(CONVERTER, inputs, MAXCONVERTCPU, CONVERTPOLLTIME)
+    runner = LocalRunner(get_converter(), inputs, MAXCONVERTCPU, CONVERTPOLLTIME)
     runner.run()
     result = runner.output_files['result']
     with outpath.open(WMODE) as outfile:  # TODO: handle python objects (don't deserialize them)
@@ -132,6 +135,6 @@ def translate_cli_input(clidata, desired):
                   'input_format': pickle.dumps(input_extension, protocol=PICKLE_PROTOCOL),
                   'output_format': pickle.dumps(desired, protocol=PICKLE_PROTOCOL)}
 
-        runner = LocalRunner(CONVERTER, inputs, MAXCONVERTCPU, CONVERTPOLLTIME)
+        runner = LocalRunner(get_converter(), inputs, MAXCONVERTCPU, CONVERTPOLLTIME)
         runner.run()
         return runner.output_files['result'].open('rb').read()

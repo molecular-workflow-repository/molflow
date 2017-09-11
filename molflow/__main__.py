@@ -26,16 +26,16 @@ def parser():
     info_argparser(cmdparser)
     convert_argparser(cmdparser)
     create_argparser(cmdparser)
-    tag_argparser(cmdparser)
+#    tag_argparser(cmdparser)
     cwl_argparser(cmdparser)
     return parser
 
 
-def tag_argparser(cmdparser):
-    tag = cmdparser.add_parser('tag', help='Tag a development workflow with a new version',
-                                parents=[workflow_name_parser])
-    tag.add_argument('newversion', help='Semantic version number')
-    tag.set_defaults(func=versioning.tag_workflow)
+# def tag_argparser(cmdparser):
+#     tag = cmdparser.add_parser('tag', help='Tag a development workflow with a new version',
+#                                 parents=[workflow_name_parser])
+#     tag.add_argument('newversion', help='Semantic version number')
+#     tag.set_defaults(func=versioning.tag_workflow)
 
 
 def create_argparser(cmdparser):
@@ -53,6 +53,7 @@ def info_argparser(cmdparser):
 
 def list_argparser(cmdparser):
     lister = cmdparser.add_parser('list', help='List available workflows')
+    lister.add_argument('--verbose','-v',help='Verbose output: will show all versions for each workflow',action='store_true')
     lister.add_argument('keywords', nargs='*',
                         help="Only list workflows with these keywords")
     lister.set_defaults(func=info.list_workflows)
@@ -60,6 +61,8 @@ def list_argparser(cmdparser):
 
 def run_argparser(cmdparser):
     run = cmdparser.add_parser('run', help='Run a workflow', parents=[workflow_name_parser])
+    run.add_argument('--version','-v',help='Version to use of the workflow. Identifier can be a '
+                     'version name, branch name, or other tag name.')
     run.add_argument('inputs', nargs='*',
                      help='Inputs in the form "name=value", OR path to a JSON or YAML file'
                           'specifying the inputs')
@@ -85,7 +88,7 @@ def convert_argparser(cmdparser):
     converter.add_argument('input', help='Input file or string')
     converter.add_argument('--input-format', '--fi',
                            help='Input format (default: determined from input)')
-    converter.add_argument('output', help='Ouput filename')
+    converter.add_argument('output', help='Output filename')
     converter.add_argument('--output-format', '--fo',
                            help='Input format (default: determined from output filename)')
     converter.set_defaults(func=convert.drive_converter)
