@@ -17,6 +17,7 @@ RECOGNIZED = set('mdt pdb mmcif cif sdf mol2 xyz smi smiles inchi name pdbcode m
 
 __CONVERTER = None
 def get_converter():
+    global __CONVERTER
     if __CONVERTER is None:
         convert_config = configuration.get_workflow_by_name('convert', raise_issues=True)
         __CONVERTER = convert_config.workflow
