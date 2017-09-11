@@ -1,0 +1,3 @@
+include versioneer.py
+include molflow/_version.py
+include molflow/workflows

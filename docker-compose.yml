@@ -1,0 +1,17 @@
+version: '2.1'
+
+services:
+  molflow:
+    build: .
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    entrypoint: molflow
+
+  molflow_env:
+    extends: molflow
+    stdin_open: true
+    tty: true
+    entrypoint: ""
+    working_dir: /workdir
+    command: bash
+

@@ -1,0 +1,68 @@
+inchi:
+  help: Full inCHI string (keys not supported)
+  reference: https://iupac.org/who-we-are/divisions/division-details/inchi/
+  extensions: [inchi]
+  type: 2D
+iupac:
+  help: IUPAC name. If in a file, only the first one is read
+  reference: https://en.wikipedia.org/wiki/IUPAC_nomenclature_of_organic_chemistry
+  extensions: [iupac]
+  type: 2D
+smi:
+  help: SMILES string.
+  reference: http://www.daylight.com/dayhtml/doc/theory/theory.smiles.html
+  extensions: [smi, smiles]
+  type: 2D
+mmcif:
+  help: RCSB Macromolecular crystallographic information file
+  reference: http://mmcif.wwpdb.org/
+  extensions: [cif, mmcif]
+mol2:
+  help: Tripos Mol2 file.
+  reference: http://chemyang.ccnu.edu.cn/ccb/server/AIMMS/mol2.pdf
+  extensions: [mol2]
+pdb:
+  help: RCSB protein databank file
+  reference: http://www.wwpdb.org/documentation/file-format
+  extensions: [pdb]
+pdbcode:
+  help: 4-character PDB entry code
+  reference: http://www.pdb.orb
+  extensions: [pdbcode]
+sdf:
+  help: MDL structure-data files. Here, equivalent to MDF molfiles
+  reference: https://en.wikipedia.org/wiki/Chemical_table_file
+  extensions: [sdf, mol]
+xyz:
+  help: XYZ coordinate file. Note that bonds are automatically guessed.
+  reference:
+  extensions: [xyz]
+pickle:
+  help: >
+    Pickled python objects. These objects will be deserialized and then checked against
+    the supported python objects. NOTE: a pickle file can execute arbitrary code on your
+    system. DO NOT open a pickle file from an untrusted source
+  reference: https://docs.python.org/2/library/pickle.html
+  extensions: [p, pkl, pickle]
+mdt:
+  help: Autodesk Molecular Design Toolkit object
+  reference: http://moldesign.lifesciences.autodesk.com
+  type: python
+parmed:
+  help: ParmEd Structure object
+  reference: https://parmed.github.io/ParmEd/html/index.html
+  type: python
+pyscf:
+  help: PySCF "Mole" object
+  reference: http://sunqm.net/pyscf/
+  type: python
+openmm:
+  help: OpenMM Topology object
+  reference: http://docs.openmm.org/7.1.0/api-python/index.html
+  type: python
+openbabel:
+  help: OpenBabel OBMol object
+  reference: http://openbabel.org/docs/current/
+  type: python
+
+

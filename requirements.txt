@@ -1,0 +1,6 @@
+future
+pathlib; python_version < '3.4'
+pyccc >= 0.7.0
+pyyaml
+semver
+termcolor >= 1.0

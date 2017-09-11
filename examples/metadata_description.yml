@@ -1,0 +1,19 @@
+name: [must be a valid python variable name (no spaces, no dashes)]
+authors:
+ - [author 1 name]: [author 1 organization]
+ - [author 2 name]: [author 2 organization]
+contributors:
+ - [the folks who worked on the pull request; git username starting with '@']
+description: [1 line description  -- no more than 90 characters]
+methods: |
+  [Multiline, textual description of this method. Does NOT need to describe input and output in
+   detail; that will be generated automatically from the workflow definition]
+citations:
+  - [URLs preferred if possible, cite journal articles with the DOI URL]
+keywords:
+  - [keyword 1]
+  - [keyword 2]
+
+# The following metadata is automatically generated and should NOT be placed here:
+#  - version (determined using git hashes)
+#  - inputs/outputs (part of the the workflow definition)
