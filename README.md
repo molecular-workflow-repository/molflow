@@ -9,15 +9,9 @@
   * [Workflow Advisory Board](#workflow-advisory-board)
 
 This repository is an open, growing collection of easy-to-run molecular modeling workflows. These can be thought of as "runnable methods sections" - modular computational workflows that let scientists easily:
- 1. use published methods,
+ 1. use other published methods as components,
  2. publish their own methods, and
  3. iterate and build on other's work.
- 
-It's also easy to turn one more workflows into "apps" - easy-to-use, web-based user interfaces that give a huge audience access to the power of computational chemistry. Anyone can run a the published apps, right now, from the [Molecular Simulation Tools website](https://molsim.bionano.autodesk.com).
-
-<img src="img/molsim-demo.png" height=300px>
-
-[Click here to get started with the official workflow apps](https://molsim.bionano.autodesk.com), or for more information, check out the [documentation](docs/index.md).
 
 
 ## Install CLI Tool
@@ -37,16 +31,6 @@ git clone https://github.com/molecular-workflow-repository/molflow.git
 pip install -e molflow
 ```
 
-to install the workflow tools locally.
-
-#### In a docker container
-To build a ready-to-go docker container, run:
-
-```bash
-git clone https://github.com/molecular-workflow-repository/molflow.git
-cd molflow
-docker-compose run molflow_env 
-```
 
 ## Getting the standard and sample workflows
 
