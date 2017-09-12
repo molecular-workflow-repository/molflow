@@ -106,6 +106,21 @@ class Config( object ):
                                        # .expanduser function
             import os.path
             self._workflow_paths = [Path(os.path.expanduser(str(i))).absolute() for i in self._config_paths]
+            
+        # De-duplicate the list of config paths and workflow paths.  Note that
+        # we have to do this on the expanded, absolute paths (e.g. the workflow
+        # paths), but we also have to remove the config paths that caused
+        # duplication, or we'll trigger some odd errors later when
+        # get_config_path returns > 1 result. We remove duplicates arbitrarily.
+
+        new_workflow_paths = []
+        for i in self._workflow_paths:
+            cp = self.get_config_path(i)
+            if len(self.get_config_path(i)) > 1:
+                self._config_paths.remove(cp[0])
+            else:
+                new_workflow_paths.append(i)
+        self._workflow_paths = new_workflow_paths
 
         self.discover_local_workflows()
     # end __init__(...)
@@ -216,7 +231,7 @@ class Config( object ):
         return workflows[0]
             
     def get_config_path( self, path ):
-        """Determines which workflow path in the configuration file was responsible for finding a workflow at the given path."""
+        """Determines which path in the configuration file was responsible for finding a workflow at the given path."""
         result = []
         if len(self._config_paths) == 0:
             return result
