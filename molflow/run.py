@@ -11,8 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 from __future__ import print_function
+from future.builtins import zip, map
+from past.builtins import unicode
 
 import os
 
@@ -137,8 +138,8 @@ def write_outputs(outputpath, workflow, outputs):
                 raise
             else:
                 fpath = outputpath/(name+'.'+ext)
-                with fpath.open('wb') as outfile:
-                    outfile.write(serial)
+                with fpath.open('w') as outfile:
+                    outfile.write(unicode(serial))
                 files.append(fpath)
 
         elif dtype in convert.RECOGNIZED:
@@ -152,6 +153,6 @@ def write_outputs(outputpath, workflow, outputs):
                 outfile.write(as_str)
             files.append(fpath)
 
-        locations[name] = map(str, files)
+        locations[name] = list(map(str, files))
 
     print(yaml.safe_dump({"Output locations": locations}, default_flow_style=False))
