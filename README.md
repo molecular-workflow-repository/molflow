@@ -27,8 +27,7 @@ If you'd like to run them from the command line, or start working on your own, y
 After that, you can install everything else you need by running:
 
 ```bash
-git clone https://github.com/molecular-workflow-repository/molflow.git
-pip install -e molflow
+pip install git+https://github.com/molecular-workflow-repository/molflow.git
 ```
 
 
