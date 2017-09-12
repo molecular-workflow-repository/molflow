@@ -14,6 +14,7 @@
 
 
 from __future__ import print_function
+from future.builtins import *
 
 from git import Repo, InvalidGitRepositoryError
 
@@ -90,7 +91,7 @@ class WorkflowVersions(object):
         # some issues. See
         # e.g. http://gitpython.readthedocs.io/en/stable/tutorial.html#switching-branches
         
-        all_tag_names = list(zip(*self.git_version_tags)[0]) + self.git_other_tags
+        all_tag_names = list(next(zip(*self.git_version_tags))) + self.git_other_tags
                         # This zip is the first item of each tag entry in git_version_tags, as a list and the concatenated with the other tags list.
         if version_name in all_tag_names:
             for tag in self.git_repo.tags:
@@ -146,7 +147,9 @@ class WorkflowVersions(object):
                 return lines
             
         if len(self.git_version_tags) > 0:
-            result += format_line("Versions: ",list(reversed(zip(*self.git_version_tags)[0])),offset, prev_line)
+            result += format_line("Versions: ",
+                                  list(reversed(next(zip(*self.git_version_tags)))),
+                                  offset, prev_line)
             prev_line = False
 
         if len(self.git_other_tags) > 0:
